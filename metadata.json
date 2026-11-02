@@ -1,0 +1,6 @@
+{
+  "name": "TaskPulse: Focus, Workout & Streak Tracker",
+  "description": "A local-first daily task manager with audio alarms, homework planner, bodyweight workout tracking, streaks, weekly reports, and startup launcher.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
