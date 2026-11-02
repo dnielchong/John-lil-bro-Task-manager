@@ -48,6 +48,8 @@ interface TaskContextType {
   completeAlarmTask: () => void;
   testAlarmSound: (soundName?: string) => void;
   requestNotificationPermission: () => Promise<boolean>;
+  sendTestScreenNotification: () => Promise<boolean>;
+  notificationPermission: NotificationPermission | 'unsupported';
 }
 
 const STORAGE_KEYS = {
@@ -112,15 +114,66 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
   }, [settings]);
 
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+  );
+
   // Request Notification permission
   const requestNotificationPermission = useCallback(async () => {
-    if (!('Notification' in window)) return false;
+    if (!('Notification' in window)) {
+      setNotificationPermission('unsupported');
+      return false;
+    }
     try {
       const perm = await Notification.requestPermission();
+      setNotificationPermission(perm);
+      if (perm === 'granted') {
+        setSettings(prev => ({ ...prev, desktopNotifications: true }));
+      }
       return perm === 'granted';
     } catch {
       return false;
     }
+  }, []);
+
+  // Send a test screen notification to show the user how it looks on their computer screen
+  const sendTestScreenNotification = useCallback(async () => {
+    if (!('Notification' in window)) {
+      setNotificationPermission('unsupported');
+      return false;
+    }
+
+    let perm = Notification.permission;
+    if (perm !== 'granted') {
+      perm = await Notification.requestPermission();
+      setNotificationPermission(perm);
+    }
+
+    if (perm === 'granted') {
+      setSettings(prev => ({ ...prev, desktopNotifications: true }));
+      try {
+        const notif = new Notification("Task Manager: Screen Alert Active! 🔔", {
+          body: "Computer screen notifications are working! You will receive native popups for hourly workouts and the 8:00 PM Central cleanup.",
+          icon: '/icon.svg',
+          tag: 'task-manager-test-alert',
+          requireInteraction: true, // Remains on screen until user interacts with it
+          silent: false,
+        });
+
+        notif.onclick = () => {
+          window.focus();
+          try {
+            notif.close();
+          } catch {
+            // ignore
+          }
+        };
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    return false;
   }, []);
 
   // Audio test - sustained 25s alarm
@@ -166,17 +219,28 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           soundEngine.startAlarmLoop(matched.alarmSound || settings.alarmSound, settings.volume, 45);
         }
 
+        // Screen notification on user's computer screen
         if (settings.desktopNotifications && 'Notification' in window && Notification.permission === 'granted') {
           try {
-            new Notification(`TaskPulse: ${matched.title}`, {
+            const notif = new Notification(`Task Manager: ${matched.title}`, {
               body: matched.category === 'workout'
-                ? `Time for workout! Target: ${matched.targetReps || 15} reps`
+                ? `Time for workout! Target: ${matched.targetReps || 15} reps (${matched.workoutType || 'pushups'})`
                 : matched.category === 'cleaning'
                 ? `8:00 PM Central: Time to clean up the house!`
                 : `Task reminder: ${matched.title}`,
               icon: '/icon.svg',
               tag: matched.id,
+              requireInteraction: true, // Keeps alert visible on computer screen
             });
+
+            notif.onclick = () => {
+              window.focus();
+              try {
+                notif.close();
+              } catch {
+                // ignore
+              }
+            };
           } catch {
             // notification failed
           }
@@ -458,6 +522,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         completeAlarmTask,
         testAlarmSound,
         requestNotificationPermission,
+        sendTestScreenNotification,
+        notificationPermission,
       }}
     >
       {children}

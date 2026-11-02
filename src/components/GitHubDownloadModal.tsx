@@ -21,7 +21,7 @@ export const GitHubDownloadModal: React.FC<GitHubDownloadModalProps> = ({ isOpen
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'taskpulse-project.zip';
+      a.download = 'task-manager-project.zip';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -36,11 +36,11 @@ export const GitHubDownloadModal: React.FC<GitHubDownloadModalProps> = ({ isOpen
   const gitSnippet = `# 1. Open terminal inside the unzipped folder:
 git init
 git add .
-git commit -m "Initial commit of TaskPulse"
+git commit -m "Changes are: added 12-hour alarms, hourly bodyweight workout reminders, 8 PM Central house cleanup, and interactive calendar schedule"
 git branch -M main
 
 # 2. Link your personal GitHub repo and push:
-git remote add origin https://github.com/YOUR_USERNAME/taskpulse.git
+git remote add origin https://github.com/YOUR_USERNAME/task-manager.git
 git push -u origin main`;
 
   const installSnippet = `# Install dependencies and run locally on your PC

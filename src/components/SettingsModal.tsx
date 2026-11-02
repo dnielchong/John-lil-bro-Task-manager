@@ -11,17 +11,31 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onOpenGitHubModal }) => {
-  const { settings, updateSettings, testAlarmSound, requestNotificationPermission } = useTask();
-  const [notificationStatus, setNotificationStatus] = useState<string>(
-    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
-  );
+  const {
+    settings,
+    updateSettings,
+    testAlarmSound,
+    requestNotificationPermission,
+    sendTestScreenNotification,
+    notificationPermission,
+  } = useTask();
+  const [testSentMessage, setTestSentMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleRequestNotification = async () => {
     const granted = await requestNotificationPermission();
-    setNotificationStatus(granted ? 'granted' : 'denied');
     updateSettings({ desktopNotifications: granted });
+  };
+
+  const handleTestScreenNotification = async () => {
+    const success = await sendTestScreenNotification();
+    if (success) {
+      setTestSentMessage("Alert sent! Check your computer's screen corner.");
+    } else {
+      setTestSentMessage("Notification blocked or not supported by system.");
+    }
+    setTimeout(() => setTestSentMessage(null), 4000);
   };
 
   const local8pm = get8pmCentralInLocalTime();
@@ -91,28 +105,52 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
             </div>
           </div>
 
-          {/* Desktop Notifications */}
-          <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="font-semibold text-white flex items-center gap-2">
-                <Bell className="w-4 h-4 text-sky-400" />
-                Desktop Notifications
-              </span>
-              <p className="text-[11px] text-neutral-400">
-                Alarms pop up on computer screen even if tab is in background.
-              </p>
+          {/* Desktop Screen Notifications */}
+          <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="font-semibold text-white flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-sky-400" />
+                  Screen Notifications (Desktop Toasts)
+                </span>
+                <p className="text-[11px] text-neutral-400">
+                  Creates a native pop-up alert on your computer screen even when minimized.
+                </p>
+              </div>
+
+              {notificationPermission === 'granted' ? (
+                <span className="flex items-center gap-1 text-emerald-400 text-xs font-semibold shrink-0">
+                  <ShieldCheck className="w-4 h-4" /> Enabled
+                </span>
+              ) : (
+                <button
+                  onClick={handleRequestNotification}
+                  className="px-2.5 py-1 rounded bg-white hover:bg-neutral-200 text-black text-xs font-bold transition cursor-pointer shrink-0"
+                >
+                  Enable Screen Popups
+                </button>
+              )}
             </div>
-            {notificationStatus === 'granted' ? (
-              <span className="flex items-center gap-1 text-emerald-400 text-xs font-semibold">
-                <ShieldCheck className="w-4 h-4" /> Enabled
+
+            {/* Test Button & System Information */}
+            <div className="pt-2 border-t border-neutral-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span className="text-[10px] text-neutral-400">
+                Pops up in bottom-right (Windows) or top-right (macOS)
               </span>
-            ) : (
+
               <button
-                onClick={handleRequestNotification}
-                className="px-2.5 py-1 rounded bg-white hover:bg-neutral-200 text-black text-xs font-bold transition cursor-pointer"
+                onClick={handleTestScreenNotification}
+                className="px-2.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white font-medium text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
               >
-                Enable
+                <Bell className="w-3.5 h-3.5 text-sky-400" />
+                <span>Test Screen Notification</span>
               </button>
+            </div>
+
+            {testSentMessage && (
+              <div className="p-2 rounded bg-sky-950/40 border border-sky-800 text-sky-300 text-[11px] flex items-center justify-between">
+                <span>{testSentMessage}</span>
+              </div>
             )}
           </div>
 

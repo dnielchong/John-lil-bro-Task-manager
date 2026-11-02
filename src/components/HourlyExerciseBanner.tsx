@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, Clock, Bell, Sparkles, Play, ToggleRight, ToggleLeft } from 'lucide-react';
+import { Dumbbell, Clock, Bell, Sparkles, Play, ToggleRight, ToggleLeft, Monitor } from 'lucide-react';
 import { useTask } from '../context/TaskContext';
 import { getCentralTimeInfo, get8pmCentralInLocalTime } from '../utils/defaults';
 import { soundEngine } from '../utils/sound';
 
 export const HourlyExerciseBanner: React.FC = () => {
-  const { settings, updateSettings, setActiveWorkoutTask, tasks } = useTask();
+  const {
+    settings,
+    updateSettings,
+    setActiveWorkoutTask,
+    tasks,
+    sendTestScreenNotification,
+    notificationPermission,
+  } = useTask();
   const [minutesToNextHour, setMinutesToNextHour] = useState(60 - new Date().getMinutes());
   const [centralInfo, setCentralInfo] = useState(getCentralTimeInfo());
   const [isTestingBell, setIsTestingBell] = useState(false);
+  const [screenToastActive, setScreenToastActive] = useState(false);
 
   useEffect(() => {
     const updateTimes = () => {
@@ -31,6 +39,14 @@ export const HourlyExerciseBanner: React.FC = () => {
         setIsTestingBell(false);
       }, 25000);
     }
+  };
+
+  const handleTestScreen = async () => {
+    setScreenToastActive(true);
+    await sendTestScreenNotification();
+    setTimeout(() => {
+      setScreenToastActive(false);
+    }, 3500);
   };
 
   const triggerHourlyNow = () => {
@@ -144,10 +160,20 @@ export const HourlyExerciseBanner: React.FC = () => {
           </button>
         </div>
 
-        <div className="mt-3 pt-2.5 border-t border-neutral-800 flex items-center justify-between text-xs">
-          <span className="text-neutral-400 text-[11px]">
-            Dishes, surfaces, trash &amp; next day reset
-          </span>
+        <div className="mt-3 pt-2.5 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <button
+            onClick={handleTestScreen}
+            className={`px-2 py-1 rounded-md border text-[11px] font-medium flex items-center gap-1 transition cursor-pointer ${
+              screenToastActive
+                ? 'bg-sky-400 text-black border-sky-400 font-bold'
+                : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300 hover:text-white'
+            }`}
+            title="Pop up a native test notification on your computer screen"
+          >
+            <Monitor className="w-3 h-3 text-sky-400" />
+            <span>{screenToastActive ? 'Screen Alert Sent!' : 'Test Screen Alert'}</span>
+          </button>
+
           <button
             onClick={toggleTestBell}
             className={`px-2.5 py-1 rounded-md border text-xs font-medium flex items-center gap-1 transition cursor-pointer ${

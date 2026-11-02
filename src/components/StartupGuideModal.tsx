@@ -19,7 +19,7 @@ export const StartupGuideModal: React.FC = () => {
 
   const downloadWindowsBat = () => {
     const batContent = `@echo off
-echo Starting TaskPulse...
+echo Starting Task Manager...
 start "" "${appUrl}"
 exit
 `;
@@ -27,7 +27,7 @@ exit
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Launch-TaskPulse-At-Startup.bat';
+    a.download = 'Launch-Task-Manager-At-Startup.bat';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -35,7 +35,7 @@ exit
   };
 
   const openAppWindow = () => {
-    window.open(appUrl, 'TaskPulseApp', 'width=900,height=750,menubar=no,toolbar=no,location=no,status=no');
+    window.open(appUrl, 'TaskManagerApp', 'width=900,height=750,menubar=no,toolbar=no,location=no,status=no');
   };
 
   return (
@@ -101,7 +101,7 @@ exit
                   <strong className="text-white">Install App:</strong> Click the <strong className="text-white">"Install App"</strong> button in the top bar.
                 </li>
                 <li className="leading-relaxed">
-                  <strong className="text-white">Enable Auto-Launch:</strong> In Chrome or Edge, open <code className="px-1.5 py-0.5 rounded bg-neutral-900 text-neutral-200 font-mono text-[11px]">chrome://apps</code>, right-click <strong className="text-white">TaskPulse</strong>, and check <strong className="text-emerald-400">Start app when you sign in</strong>.
+                  <strong className="text-white">Enable Auto-Launch:</strong> In Chrome or Edge, open <code className="px-1.5 py-0.5 rounded bg-neutral-900 text-neutral-200 font-mono text-[11px]">chrome://apps</code>, right-click <strong className="text-white">Task Manager</strong>, and check <strong className="text-emerald-400">Start app when you sign in</strong>.
                 </li>
                 <li className="leading-relaxed">
                   <strong className="text-white">Done:</strong> The app will automatically open in a dedicated window each time you boot up your computer.
@@ -151,13 +151,24 @@ exit
           {activeOS === 'mac' && (
             <div className="space-y-2 bg-neutral-950 p-4 rounded-xl border border-neutral-800">
               <ol className="list-decimal list-inside space-y-2 text-neutral-300">
-                <li>Install TaskPulse as a web app.</li>
+                <li>Install Task Manager as a web app.</li>
                 <li>Open <strong className="text-white">System Settings</strong> on your Mac.</li>
                 <li>Go to <strong className="text-white">General</strong> &gt; <strong className="text-white">Login Items</strong>.</li>
-                <li>Under "Open at Login", click the <strong className="text-white">+</strong> button and select <strong className="text-white">TaskPulse</strong>.</li>
+                <li>Under "Open at Login", click the <strong className="text-white">+</strong> button and select <strong className="text-white">Task Manager</strong>.</li>
               </ol>
             </div>
           )}
+
+          {/* Screen notification note */}
+          <div className="p-3 rounded-xl bg-neutral-950 border border-neutral-800 flex items-start gap-2.5 text-[11px] text-neutral-300">
+            <span className="text-sky-400 font-bold text-sm leading-none mt-0.5">🔔</span>
+            <div className="space-y-0.5">
+              <span className="font-semibold text-white block">Computer Screen Notifications</span>
+              <p className="text-neutral-400 leading-relaxed">
+                When downloaded or running on startup, alarms trigger native computer pop-ups (Windows toast / macOS banner) that stay on screen with sound even when the app is minimized.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}

@@ -5,7 +5,7 @@ export async function generateProjectZip(): Promise<Blob> {
 
   // Root config files
   zip.file('package.json', JSON.stringify({
-    name: "taskpulse",
+    name: "task-manager",
     private: true,
     version: "1.0.0",
     type: "module",
@@ -69,11 +69,11 @@ export default defineConfig({
       includeAssets: ['icon.svg', 'apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
         id: '/',
-        name: 'TaskPulse: Focus, Workout & Streak Tracker',
-        short_name: 'TaskPulse',
-        description: 'Local task manager with alarms for homework, bodyweight workouts, streaks, and weekly summaries.',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        name: 'Task Manager',
+        short_name: 'TaskManager',
+        description: 'Local task manager with 12-hour alarms for homework, bodyweight workouts, and interactive calendar.',
+        theme_color: '#000000',
+        background_color: '#000000',
         display: 'standalone',
         start_url: '/',
         scope: '/',
@@ -94,15 +94,15 @@ dist-ssr
 .DS_Store
 `);
 
-  zip.file('README.md', `# ⚡ TaskPulse: Focus, Workout & Streak Tracker
+  zip.file('README.md', `# ⚡ Task Manager
 
-A fast, local-first daily task manager designed to keep you disciplined and motivated:
-- ⏰ **Audio Alarms & Desktop Notifications**: Scheduled reminders for assignments, homework, and routines.
+A fast, local-first daily task manager designed to keep you focused and disciplined:
+- ⏰ **12-Hour Audio Alarms & Desktop Notifications**: Scheduled reminders for assignments, homework, and routines.
 - 🏋️ **Hourly Body Exercise Alarm**: Reminds you every hour to complete bodyweight exercises (pushups, squats, planks) with an interactive set logger and rest countdown.
 - 🧹 **8:00 PM Central House Cleanup**: Built-in daily reminder to tidy up your space, wash dishes, and prep for tomorrow.
-- 🔥 **Streak & Motivation Engine**: Live activity heatmap, current & longest streak tracking, and unlockable achievement badges.
+- 📅 **Interactive Calendar**: Schedule important tasks on specific dates with targeted alarms.
+- 🔥 **Streak & Motivation Engine**: Current & longest streak tracking, and unlockable achievement badges.
 - 💻 **Computer Startup Launcher**: Instructions and batch script to open automatically on Windows, Mac, Linux, or as a native PWA on boot.
-- 📊 **Weekly Summary Report**: Comprehensive end-of-week analytics, consistency metrics, and self-reflection notes.
 
 ---
 
@@ -133,12 +133,12 @@ git init
 
 # 2. Stage and commit all files
 git add .
-git commit -m "feat: TaskPulse task and workout manager"
+git commit -m "Changes are: added 12-hour alarms, hourly bodyweight workout reminders, 8 PM Central house cleanup, and interactive calendar schedule"
 
 # 3. Create a repository on GitHub (https://github.com/new)
 # Then link your remote and push:
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/taskpulse.git
+git remote add origin https://github.com/YOUR_USERNAME/task-manager.git
 git push -u origin main
 \`\`\`
 
@@ -149,11 +149,11 @@ git push -u origin main
 ### Method A: Install as Chrome / Edge PWA (Easiest)
 1. Open the app in Chrome or Edge.
 2. Click the **"Install App"** button in the top bar.
-3. Once installed, go to \`chrome://apps\`, right-click **TaskPulse**, and check **"Start app when you sign in"**.
+3. Once installed, go to \`chrome://apps\`, right-click **Task Manager**, and check **"Start app when you sign in"**.
 
 ### Method B: Windows Startup Folder
 1. Press \`Win + R\`, type \`shell:startup\`, and press Enter.
-2. Create a shortcut to \`http://localhost:5173\` (or your hosted URL) in that folder.
+2. Create a shortcut to the app in that folder.
 `);
 
   return await zip.generateAsync({ type: 'blob' });
